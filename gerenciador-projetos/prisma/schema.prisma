@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Premio {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  descricao String
+  ano       Int
+  createdAt DateTime  @default(now())
+  projetos  Projeto[]
+}
+
+model Autor {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  projetos  Projeto[]
+}
+
+model Avaliador {
+  id         Int         @id @default(autoincrement())
+  nome       String
+  email      String      @unique
+  createdAt  DateTime    @default(now())
+  avaliacoes Avaliacao[]
+}
+
+model Projeto {
+  id         Int         @id @default(autoincrement())
+  titulo     String
+  descricao  String
+  autorId    Int
+  premioId   Int?
+  createdAt  DateTime    @default(now())
+  avaliacoes Avaliacao[]
+  autor      Autor       @relation(fields: [autorId], references: [id])
+  premio     Premio?     @relation(fields: [premioId], references: [id])
+}
+
+model Avaliacao {
+  id          Int       @id @default(autoincrement())
+  projetoId   Int
+  avaliadorId Int
+  nota        Float
+  comentario  String
+  createdAt   DateTime  @default(now())
+  avaliador   Avaliador @relation(fields: [avaliadorId], references: [id])
+  projeto     Projeto   @relation(fields: [projetoId], references: [id])
+}

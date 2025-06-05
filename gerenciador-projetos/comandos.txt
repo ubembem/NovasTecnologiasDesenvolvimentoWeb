@@ -1,0 +1,29 @@
+Comandos:
+Listar: curl http://localhost:3000/api/premios
+
+Criar: curl -X POST http://localhost:3000/api/premios -H "Content-Type: application/json" -d '{"nome":"Prêmio Demo","descricao":"Teste","ano":2025}'
+
+Atualizar: curl -X PUT http://localhost:3000/api/premios/1 -H "Content-Type: application/json" -d '{"nome":"Prêmio Atualizado","descricao":"Atualizado","ano":2025}'
+
+Excluir: curl -X DELETE http://localhost:3000/api/premios/1
+
+Testes:
+Iniciar: npm start
+
+Hello World: curl http://localhost:3000/
+
+Listar prêmios: curl http://localhost:3000/api/premios
+
+Criar prêmio: curl -X POST http://localhost:3000/api/premios -H "Content-Type: application/json" -d '{"nome":"Prêmio Demo","descricao":"Teste","ano":2025}'
+
+Banco: psql -U postgres -d gerenciador_projetos; SELECT * FROM "Premio";
+
+Criar projeto: curl -X POST http://localhost:3000/api/projetos -H "Content-Type: application/json" -d '{"titulo":"Projeto Teste","descricao":"Descrição","autorId":1,"premioId":1}'
+
+Postman:
+GET /api/premios: Lista prêmios.
+
+POST /api/premios: Cria prêmio (JSON).
+
+POST /api/projetos: Cria projeto (se implementado).
+
