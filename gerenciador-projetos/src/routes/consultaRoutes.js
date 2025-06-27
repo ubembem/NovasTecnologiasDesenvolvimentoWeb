@@ -1,12 +1,26 @@
-import express from 'express';
+// import express from 'express';
+// import ConsultaController from '../controllers/ConsultaController.js';
+//
+//
+// const router = express.Router();
+//
+// router.get('/projetos-com-autores', ConsultaController.listarProjetosComAutores);
+// router.get('/autores-com-projetos', ConsultaController.listarAutoresComProjetos);
+// router.get('/projetos-nao-avaliados', ConsultaController.listarProjetosNaoAvaliados);
+// router.get('/projetos-avaliados', ConsultaController.listarProjetosAvaliados);
+// router.get('/projetos-vencedores', ConsultaController.listarProjetosVencedores);
+//
+// export default router;
+
+import { Router } from 'express';
 import { ConsultaController } from '../controllers/ConsultaController.js';
 
-const router = express.Router();
+const router = Router();
 
-router.get('/projetos-com-autores', ConsultaController.listarProjetosComAutores);
-router.get('/autores-com-projetos', ConsultaController.listarAutoresComProjetos);
-router.get('/projetos-nao-avaliados', ConsultaController.listarProjetosNaoAvaliados);
-router.get('/projetos-avaliados', ConsultaController.listarProjetosAvaliados);
-router.get('/projetos-vencedores', ConsultaController.listarProjetosVencedores);
+router.get('/projetos/autores', ConsultaController.listarProjetosComAutores);
+router.get('/autores/projetos', ConsultaController.listarAutoresComProjetos);
+router.get('/projetos/nao-avaliados', ConsultaController.listarProjetosNaoAvaliados);
+router.get('/projetos/avaliados', ConsultaController.listarProjetosAvaliados);
+router.get('/projetos/vencedores', ConsultaController.listarProjetosVencedores);
 
 export default router;

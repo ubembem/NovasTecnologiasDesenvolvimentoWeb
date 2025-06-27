@@ -1,3 +1,5 @@
+
+// services/PremioService.js
 class PremioService {
     static async getPremios(prisma) {
         return prisma.premio.findMany();
@@ -12,10 +14,7 @@ class PremioService {
     }
 
     static async updatePremio(prisma, id, data) {
-        return prisma.premio.update({
-            where: { id: parseInt(id) },
-            data,
-        });
+        return prisma.premio.update({ where: { id: parseInt(id) }, data });
     }
 
     static async deletePremio(prisma, id) {

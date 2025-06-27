@@ -1,53 +1,78 @@
-import PremioService from "../services/PremioService.js";
+// src/controllers/PremioController.js
+import prisma from '../lib/prismaClient.js';
+import { z } from 'zod';
 
-class PremioController {
-    static async getAllPremios(req, res) {
+// Validação dos dados com Zod
+const premioSchema = z.object({
+    nome: z.string().min(1, "Nome é obrigatório"),
+    descricao: z.string(),
+    ano: z.number().int(),
+    dataInicial: z.coerce.date(),
+    dataFinal: z.coerce.date(),
+});
+
+const PremioController = {
+    async getAllPremios(req, res) {
         try {
-            const premios = await PremioService.getPremios(req.prisma);
+            const premios = await prisma.premio.findMany();
             res.json(premios);
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar prêmios" });
+        } catch (err) {
+            res.status(500).json({ erro: "Erro ao buscar prêmios" });
         }
-    }
+    },
 
-    static async getPremioById(req, res) {
+    async getPremioById(req, res) {
+        const { id } = req.params;
         try {
-            const premio = await PremioService.getPremioById(req.prisma, req.params.id);
+            const premio = await prisma.premio.findUnique({
+                where: { id: Number(id) }
+            });
             if (!premio) {
-                return res.status(404).json({ error: "Prêmio não encontrado" });
+                return res.status(404).json({ erro: "Prêmio não encontrado" });
             }
             res.json(premio);
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar prêmio" });
+        } catch (err) {
+            res.status(400).json({ erro: "ID inválido" });
         }
-    }
+    },
 
-    static async createPremio(req, res) {
+    async createPremio(req, res) {
         try {
-            const premio = await PremioService.createPremio(req.prisma, req.body);
-            res.status(201).json(premio);
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao criar prêmio" });
+            const dados = premioSchema.parse(req.body);
+            const novoPremio = await prisma.premio.create({
+                data: dados
+            });
+            res.status(201).json(novoPremio);
+        } catch (err) {
+            res.status(400).json({ erro: err.errors ?? err.message });
         }
-    }
+    },
 
-    static async updatePremio(req, res) {
+    async updatePremio(req, res) {
+        const { id } = req.params;
         try {
-            const premio = await PremioService.updatePremio(req.prisma, req.params.id, req.body);
-            res.json(premio);
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao atualizar prêmio" });
+            const dados = premioSchema.parse(req.body);
+            const premioAtualizado = await prisma.premio.update({
+                where: { id: Number(id) },
+                data: dados
+            });
+            res.json(premioAtualizado);
+        } catch (err) {
+            res.status(400).json({ erro: err.errors ?? err.message });
         }
-    }
+    },
 
-    static async deletePremio(req, res) {
+    async deletePremio(req, res) {
+        const { id } = req.params;
         try {
-            await PremioService.deletePremio(req.prisma, req.params.id);
+            await prisma.premio.delete({
+                where: { id: Number(id) }
+            });
             res.status(204).send();
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao excluir prêmio" });
+        } catch (err) {
+            res.status(400).json({ erro: "Erro ao deletar prêmio" });
         }
     }
-}
+};
 
 export default PremioController;

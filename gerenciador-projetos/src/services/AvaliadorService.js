@@ -1,3 +1,4 @@
+// services/AvaliadorService.js
 class AvaliadorService {
     static async getAvaliadores(prisma) {
         return prisma.avaliador.findMany();
@@ -12,10 +13,7 @@ class AvaliadorService {
     }
 
     static async updateAvaliador(prisma, id, data) {
-        return prisma.avaliador.update({
-            where: { id: parseInt(id) },
-            data,
-        });
+        return prisma.avaliador.update({ where: { id: parseInt(id) }, data });
     }
 
     static async deleteAvaliador(prisma, id) {

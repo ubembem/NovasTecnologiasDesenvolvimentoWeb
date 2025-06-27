@@ -1,10 +1,13 @@
 class AutorService {
-    static async getAutores(prisma) {
-        return prisma.autor.findMany();
+    static async getAllAutores(prisma) {
+        return prisma.autor.findMany({ include: { projetos: true } });
     }
 
     static async getAutorById(prisma, id) {
-        return prisma.autor.findUnique({ where: { id: parseInt(id) } });
+        return prisma.autor.findUnique({
+            where: { id: parseInt(id) },
+            include: { projetos: true },
+        });
     }
 
     static async createAutor(prisma, data) {

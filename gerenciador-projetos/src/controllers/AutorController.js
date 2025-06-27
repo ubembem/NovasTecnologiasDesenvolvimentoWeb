@@ -1,54 +1,72 @@
-import AutorService from "../services/AutorService.js";
+// src/controllers/AutorController.js
+import prisma from '../lib/prismaClient.js';
+import { z } from 'zod';
 
-class AutorController {
-    static async getAllAutores(req, res) {
+const autorSchema = z.object({
+    nome: z.string().min(1),
+    email: z.string().email(),
+    cpf: z.string().min(11).max(14),
+    telefone: z.string()
+});
+
+const AutorController = {
+    async getAllAutores(req, res) {
         try {
-            const autores = await AutorService.getAutores(req.prisma);
-            console.log("Sem autores ainda teste")
+            const autores = await prisma.autor.findMany();
             res.json(autores);
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar autores" });
+        } catch (err) {
+            res.status(500).json({ erro: "Erro ao buscar autores" });
         }
-    }
+    },
 
-    static async getAutorById(req, res) {
+    async getAutorById(req, res) {
+        const { id } = req.params;
         try {
-            const autor = await AutorService.getAutorById(req.prisma, req.params.id);
+            const autor = await prisma.autor.findUnique({
+                where: { id: Number(id) }
+            });
             if (!autor) {
-                return res.status(404).json({ error: "Autor não encontrado" });
+                return res.status(404).json({ erro: "Autor não encontrado" });
             }
             res.json(autor);
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar autor" });
+        } catch (err) {
+            res.status(400).json({ erro: "ID inválido" });
         }
-    }
+    },
 
-    static async createAutor(req, res) {
+    async createAutor(req, res) {
         try {
-            const autor = await AutorService.createAutor(req.prisma, req.body);
-            res.status(201).json(autor);
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao criar autor" });
+            const dados = autorSchema.parse(req.body);
+            const novo = await prisma.autor.create({ data: dados });
+            res.status(201).json(novo);
+        } catch (err) {
+            res.status(400).json({ erro: err.errors ?? err.message });
         }
-    }
+    },
 
-    static async updateAutor(req, res) {
+    async updateAutor(req, res) {
+        const { id } = req.params;
         try {
-            const autor = await AutorService.updateAutor(req.prisma, req.params.id, req.body);
-            res.json(autor);
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao atualizar autor" });
+            const dados = autorSchema.parse(req.body);
+            const atualizado = await prisma.autor.update({
+                where: { id: Number(id) },
+                data: dados
+            });
+            res.json(atualizado);
+        } catch (err) {
+            res.status(400).json({ erro: err.errors ?? err.message });
         }
-    }
+    },
 
-    static async deleteAutor(req, res) {
+    async deleteAutor(req, res) {
+        const { id } = req.params;
         try {
-            await AutorService.deleteAutor(req.prisma, req.params.id);
+            await prisma.autor.delete({ where: { id: Number(id) } });
             res.status(204).send();
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao excluir autor" });
+        } catch (err) {
+            res.status(400).json({ erro: "Erro ao deletar autor" });
         }
     }
-}
+};
 
 export default AutorController;

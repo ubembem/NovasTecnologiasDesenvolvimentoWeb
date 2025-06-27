@@ -1,53 +1,72 @@
-import AvaliadorService from "../services/AvaliadorService.js";
+// src/controllers/AvaliadorController.js
+import prisma from '../lib/prismaClient.js';
+import { z } from 'zod';
 
-class AvaliadorController {
-    static async getAllAvaliadores(req, res) {
+const avaliadorSchema = z.object({
+    nome: z.string().min(1),
+    email: z.string().email(),
+    cpf: z.string().min(11).max(14),
+    telefone: z.string()
+});
+
+const AvaliadorController = {
+    async getAllAvaliadores(req, res) {
         try {
-            const avaliadores = await AvaliadorService.getAvaliadores(req.prisma);
+            const avaliadores = await prisma.avaliador.findMany();
             res.json(avaliadores);
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar avaliadores" });
+        } catch (err) {
+            res.status(500).json({ erro: "Erro ao buscar avaliadores" });
         }
-    }
+    },
 
-    static async getAvaliadorById(req, res) {
+    async getAvaliadorById(req, res) {
+        const { id } = req.params;
         try {
-            const avaliador = await AvaliadorService.getAvaliadorById(req.prisma, req.params.id);
+            const avaliador = await prisma.avaliador.findUnique({
+                where: { id: Number(id) }
+            });
             if (!avaliador) {
-                return res.status(404).json({ error: "Avaliador não encontrado" });
+                return res.status(404).json({ erro: "Avaliador não encontrado" });
             }
             res.json(avaliador);
-        } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar avaliador" });
+        } catch (err) {
+            res.status(400).json({ erro: "ID inválido" });
         }
-    }
+    },
 
-    static async createAvaliador(req, res) {
+    async createAvaliador(req, res) {
         try {
-            const avaliador = await AvaliadorService.createAvaliador(req.prisma, req.body);
-            res.status(201).json(avaliador);
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao criar avaliador" });
+            const dados = avaliadorSchema.parse(req.body);
+            const novo = await prisma.avaliador.create({ data: dados });
+            res.status(201).json(novo);
+        } catch (err) {
+            res.status(400).json({ erro: err.errors ?? err.message });
         }
-    }
+    },
 
-    static async updateAvaliador(req, res) {
+    async updateAvaliador(req, res) {
+        const { id } = req.params;
         try {
-            const avaliador = await AvaliadorService.updateAvaliador(req.prisma, req.params.id, req.body);
-            res.json(avaliador);
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao atualizar avaliador" });
+            const dados = avaliadorSchema.parse(req.body);
+            const atualizado = await prisma.avaliador.update({
+                where: { id: Number(id) },
+                data: dados
+            });
+            res.json(atualizado);
+        } catch (err) {
+            res.status(400).json({ erro: err.errors ?? err.message });
         }
-    }
+    },
 
-    static async deleteAvaliador(req, res) {
+    async deleteAvaliador(req, res) {
+        const { id } = req.params;
         try {
-            await AvaliadorService.deleteAvaliador(req.prisma, req.params.id);
+            await prisma.avaliador.delete({ where: { id: Number(id) } });
             res.status(204).send();
-        } catch (error) {
-            res.status(400).json({ error: "Erro ao excluir avaliador" });
+        } catch (err) {
+            res.status(400).json({ erro: "Erro ao deletar avaliador" });
         }
     }
-}
+};
 
 export default AvaliadorController;
