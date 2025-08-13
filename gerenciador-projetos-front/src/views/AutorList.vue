@@ -1,30 +1,87 @@
 <template>
-  <div class="bg-primary mb-4">
-    <h2>Autores</h2>
-    <router-link class="btn btn-secondary mb-3" to="/autores/novo">Novo Autor</router-link>
-    <table class="table table-striped">
-      <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nome</th>
-        <th>E-mail</th>
-        <th>Ações</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="autor in autores" :key="autor.id">
-        <td>{{ autor.id }}</td>
-        <td>{{ autor.nome }}</td>
-        <td>{{ autor.email }}</td>
-        <td>
-          <router-link class="btn btn-sm btn-warning" :to="`/autores/editar/${autor.id}`">Editar</router-link>
-          <button class="btn btn-sm btn-danger" @click="deletarAutor(autor.id)">Excluir</button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <div class="table-responsive">
+    <h2>Lista de Autores</h2>
+    <router-link class="btn btn-primary mb-4" to="/autores/novo">Novo Autor</router-link>
+
+    <div class="table table-striped">
+      <table class="table table-striped table-bordered table-hover w-100">
+        <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>CPF</th>
+          <th>Telefone</th>
+          <th style="width: 150px;">Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="autor in autores" :key="autor.id">
+          <td>{{ autor.id }}</td>
+          <td>{{ autor.nome }}</td>
+          <td>{{ autor.email }}</td>
+          <td>{{ autor.cpf || 'Não informado' }}</td>
+          <td>{{ autor.telefone || 'Não informado' }}</td>
+          <td>
+            <router-link :to="`/autores/editar/${autor.id}`" class="btn btn-warning btn-sm me-2">Editar</router-link>
+            <button @click="deletarAutor(autor.id)" class="btn btn-danger btn-sm">Excluir</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+
 </template>
+
+<!--<template>-->
+<!--  <div class="container my-4">-->
+<!--    <h2 class="mb-4">Lista de Autores</h2>-->
+
+<!--    <router-link class="btn btn-primary mb-4" to="/autores/novo">-->
+<!--      Novo Autor-->
+<!--    </router-link>-->
+
+<!--    <div class="table-responsive">-->
+<!--      <table class="table table-striped table-bordered table-hover w-100">-->
+<!--        <thead class="table-dark">-->
+<!--        <tr>-->
+<!--          <th>ID</th>-->
+<!--          <th>Nome</th>-->
+<!--          <th>Email</th>-->
+<!--          <th>CPF</th>-->
+<!--          <th>Telefone</th>-->
+<!--          <th style="width: 150px;">Ações</th>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--        <tr v-for="autor in autores" :key="autor.id">-->
+<!--          <td>{{ autor.id }}</td>-->
+<!--          <td>{{ autor.nome }}</td>-->
+<!--          <td>{{ autor.email }}</td>-->
+<!--          <td>{{ autor.cpf || 'Não informado' }}</td>-->
+<!--          <td>{{ autor.telefone || 'Não informado' }}</td>-->
+<!--          <td>-->
+<!--            <router-link-->
+<!--                :to="`/autores/editar/${autor.id}`"-->
+<!--                class="btn btn-warning btn-sm me-2"-->
+<!--            >-->
+<!--              Editar-->
+<!--            </router-link>-->
+<!--            <button-->
+<!--                @click="deletarAutor(autor.id)"-->
+<!--                class="btn btn-danger btn-sm"-->
+<!--            >-->
+<!--              Excluir-->
+<!--            </button>-->
+<!--          </td>-->
+<!--        </tr>-->
+<!--        </tbody>-->
+<!--      </table>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</template>-->
+
 
 <script>
 import axios from 'axios';

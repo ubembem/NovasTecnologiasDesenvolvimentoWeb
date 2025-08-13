@@ -14,6 +14,14 @@
         <label class="form-label">Ano</label>
         <input v-model.number="premio.ano" type="number" class="form-control" required />
       </div>
+      <div class="mb-3">
+        <label class="form-label">Data inicial</label>
+        <input v-model.number="premio.dataInicial" type="datetime" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">data final</label>
+        <input v-model.number="premio.dataFinal" type="datetime" class="form-control" required />
+      </div>
       <button type="submit" class="btn btn-primary">Salvar</button>
       <router-link class="btn btn-secondary" to="/premios">Cancelar</router-link>
     </form>

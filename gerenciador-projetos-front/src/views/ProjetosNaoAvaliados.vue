@@ -1,12 +1,11 @@
 <template>
-  <div class="bg-primary mb-4 p-4 rounded text-white">
+  <div class="table-responsive">
     <h2>Projetos Não Avaliados</h2>
-    <router-link class="btn btn-secondary mb-3" to="/avaliacoes/novo">Avaliar</router-link>
     <div v-if="projetos.length === 0" class="alert alert-info">
       Nenhum projeto não avaliado encontrado.
     </div>
     <table v-else class="table table-striped bg-white text-dark">
-      <thead>
+      <thead class="table-dark">
       <tr>
         <th>ID</th>
         <th>Título</th>
@@ -24,7 +23,8 @@
         <td>{{ projeto.autor ? projeto.autor.nome : 'N/A' }}</td>
         <td>{{ projeto.premio ? projeto.premio.nome : 'N/A' }}</td>
         <td>
-          <router-link class="btn btn-sm btn-warning" :to="`/projetos/editar/${projeto.id}`">Editar</router-link>
+          <router-link class="btn btn-sm btn-warning" :to="`/avaliacoes/editar/${projeto.id}`">Editar</router-link>
+          <router-link class="btn btn-sm btn-warning" :to="`/avaliacoes/novo/${projeto.id}`">Avaliar</router-link>
           <button class="btn btn-sm btn-danger" @click="deletarProjeto(projeto.id)">Excluir</button>
         </td>
       </tr>
@@ -48,7 +48,7 @@ export default {
   methods: {
     async carregarProjetos() {
       try {
-        const response = await axios.get('http://localhost:3000/api/consultas/projetos-nao-avaliados');
+        const response = await axios.get('http://localhost:3000/api/consultas/listarProjetosNaoAvaliados');
         console.log('Dados recebidos:', response.data);
         this.projetos = response.data;
       } catch (error) {

@@ -1,38 +1,51 @@
 // src/controllers/AvaliacaoController.js
-import prisma from '../lib/prismaClient.js';
+import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
+const prisma = new PrismaClient();
+
+// Schema de validação
 const avaliacaoSchema = z.object({
-    nota: z.number().min(0).max(10),
+    projetoId: z.number(),
+    avaliadorId: z.number(),
+    nota: z.number().min(0).max(10, "Nota deve ser entre 0 e 10"),
     comentario: z.string().optional(),
-    avaliadorId: z.number().int(),
-    projetoId: z.number().int()
 });
 
 const AvaliacaoController = {
+    // Listar todas as avaliações
     async getAllAvaliacoes(req, res) {
         try {
             const avaliacoes = await prisma.avaliacao.findMany({
-                include: { projeto: true, avaliador: true }
+                orderBy: { id: 'asc' },
+                include: {
+                    projeto: true,
+                    avaliador: true,
+                },
             });
             res.json(avaliacoes);
         } catch (err) {
+            console.error(err);
             res.status(500).json({ erro: "Erro ao buscar avaliações" });
         }
     },
 
+    // Buscar avaliação por ID
     async getAvaliacaoById(req, res) {
         const { id } = req.params;
         try {
             const avaliacao = await prisma.avaliacao.findUnique({
                 where: { id: Number(id) },
-                include: { projeto: true, avaliador: true }
+                include: { projeto: true, avaliador: true },
             });
+
             if (!avaliacao) {
                 return res.status(404).json({ erro: "Avaliação não encontrada" });
             }
+
             res.json(avaliacao);
         } catch (err) {
+            console.error(err);
             res.status(400).json({ erro: "ID inválido" });
         }
     },
@@ -41,30 +54,44 @@ const AvaliacaoController = {
         try {
             const dados = avaliacaoSchema.parse(req.body);
 
-            // Regra: avaliador não pode avaliar o próprio projeto
+            // Buscar projeto com autores
             const projeto = await prisma.projeto.findUnique({
                 where: { id: dados.projetoId },
-                include: { autor: true }
+                include: { autores: true },
             });
+
+            if (!projeto) {
+                return res.status(404).json({ erro: "Projeto não encontrado" });
+            }
+
+            // Buscar avaliador para pegar CPF
             const avaliador = await prisma.avaliador.findUnique({
-                where: { id: dados.avaliadorId }
+                where: { id: dados.avaliadorId },
             });
 
-            if (!projeto || !avaliador) {
-                return res.status(400).json({ erro: "Projeto ou Avaliador inválido" });
+            if (!avaliador) {
+                return res.status(404).json({ erro: "Avaliador não encontrado" });
             }
 
-            const autoresDoProjeto = await prisma.autorProjeto.findMany({
-                where: { projetoId: projeto.id }
+            // Comparar CPF do avaliador com os CPFs dos autores do projeto
+            const isAutor = projeto.autores.some(a => a.cpf === avaliador.cpf);
+            if (isAutor) {
+                return res.status(400).json({ erro: "O avaliador não pode avaliar um projeto do qual é autor" });
+            }
+
+            const avaliacao = await prisma.avaliacao.create({
+                data: {
+                    projeto: { connect: { id: dados.projetoId } },
+                    avaliador: { connect: { id: dados.avaliadorId } },
+                    nota: dados.nota,
+                    comentario: dados.comentario ?? null,
+                },
+                include: { projeto: true, avaliador: true },
             });
 
-            if (autoresDoProjeto.some(a => a.autorId === dados.avaliadorId)) {
-                return res.status(400).json({ erro: "Avaliador não pode avaliar o próprio projeto" });
-            }
-
-            const novaAvaliacao = await prisma.avaliacao.create({ data: dados });
-            res.status(201).json(novaAvaliacao);
+            res.status(201).json(avaliacao);
         } catch (err) {
+            console.error(err);
             res.status(400).json({ erro: err.errors ?? err.message });
         }
     },
@@ -73,25 +100,63 @@ const AvaliacaoController = {
         const { id } = req.params;
         try {
             const dados = avaliacaoSchema.parse(req.body);
-            const atualizada = await prisma.avaliacao.update({
-                where: { id: Number(id) },
-                data: dados
+
+            // Buscar projeto com autores
+            const projeto = await prisma.projeto.findUnique({
+                where: { id: dados.projetoId },
+                include: { autores: true },
             });
-            res.json(atualizada);
+
+            if (!projeto) {
+                return res.status(404).json({ erro: "Projeto não encontrado" });
+            }
+
+            // Buscar avaliador para pegar CPF
+            const avaliador = await prisma.avaliador.findUnique({
+                where: { id: dados.avaliadorId },
+            });
+
+            if (!avaliador) {
+                return res.status(404).json({ erro: "Avaliador não encontrado" });
+            }
+
+            // Comparar CPF do avaliador com os CPFs dos autores do projeto
+            const isAutor = projeto.autores.some(a => a.cpf === avaliador.cpf);
+            if (isAutor) {
+                return res.status(400).json({ erro: "O avaliador não pode avaliar um projeto do qual é autor" });
+            }
+
+            const atualizado = await prisma.avaliacao.update({
+                where: { id: Number(id) },
+                data: {
+                    projeto: { connect: { id: dados.projetoId } },
+                    avaliador: { connect: { id: dados.avaliadorId } },
+                    nota: dados.nota,
+                    comentario: dados.comentario ?? null,
+                },
+                include: { projeto: true, avaliador: true },
+            });
+
+            res.json(atualizado);
         } catch (err) {
+            console.error(err);
             res.status(400).json({ erro: err.errors ?? err.message });
         }
     },
-
+    // Excluir avaliação
     async deleteAvaliacao(req, res) {
         const { id } = req.params;
         try {
-            await prisma.avaliacao.delete({ where: { id: Number(id) } });
-            res.status(204).send();
+            await prisma.avaliacao.delete({
+                where: { id: Number(id) },
+            });
+            res.status(204).send(); // sucesso, sem conteúdo
         } catch (err) {
+            console.error(err);
             res.status(400).json({ erro: "Erro ao deletar avaliação" });
         }
     }
 };
 
 export default AvaliacaoController;
+

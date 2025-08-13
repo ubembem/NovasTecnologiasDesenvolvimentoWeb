@@ -14,7 +14,9 @@ const premioSchema = z.object({
 const PremioController = {
     async getAllPremios(req, res) {
         try {
-            const premios = await prisma.premio.findMany();
+            const premios = await prisma.premio.findMany({
+                orderBy: { id: 'asc' }
+            });
             res.json(premios);
         } catch (err) {
             res.status(500).json({ erro: "Erro ao buscar prêmios" });

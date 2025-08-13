@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-primary mb-4 p-4 rounded text-white">
+  <div class="table-responsive">
     <h2>Projetos Avaliados</h2>
     <div v-if="projetos.length === 0" class="alert alert-info">
       Nenhum projeto avaliado encontrado.
     </div>
     <table v-else class="table table-striped bg-white text-dark">
-      <thead>
+      <thead class="table-dark">
       <tr>
         <th>ID</th>
         <th>Título</th>
@@ -53,7 +53,7 @@ export default {
   methods: {
     async carregarProjetos() {
       try {
-        const response = await axios.get('http://localhost:3000/api/consultas/projetos-avaliados');
+        const response = await axios.get('http://localhost:3000/api/consultas/listarProjetosAvaliados');
         console.log('Dados recebidos:', response.data);
         this.projetos = response.data;
       } catch (error) {

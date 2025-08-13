@@ -6,10 +6,22 @@
         <label class="form-label">Nome</label>
         <input v-model="autor.nome" class="form-control" required />
       </div>
+
       <div class="mb-3">
         <label class="form-label">E-mail</label>
-        <textarea v-model="autor.email" class="form-control" required></textarea>
+        <input v-model="autor.email" type="email" class="form-control" required />
       </div>
+
+      <div class="mb-3">
+        <label class="form-label">CPF</label>
+        <input v-model="autor.cpf" class="form-control" required />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Telefone</label>
+        <input v-model="autor.telefone" class="form-control" required />
+      </div>
+
       <button type="submit" class="btn btn-primary">Salvar</button>
       <router-link class="btn btn-secondary" to="/autores">Cancelar</router-link>
     </form>
@@ -22,7 +34,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      autor: { nome: '', email: '' },
+      autor: { nome: '', email: '', cpf: '', telefone: '' },
       id: this.$route.params.id,
     };
   },

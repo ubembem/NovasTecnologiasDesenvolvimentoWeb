@@ -1,14 +1,16 @@
 <template>
-  <div class="bg-primary mb-4">
+  <div class="table-responsive">
     <h2>Avaliadores</h2>
-    <router-link class="btn btn-secondary mb-3" to="/avaliadores/novo">Novo Avaliador</router-link>
+    <router-link class="btn btn-primary mb-4" to="/avaliadores/novo">Novo Avaliador</router-link>
     <table class="table table-striped">
-      <thead>
+      <thead class="table-dark">
       <tr>
         <th>ID</th>
         <th>Nome</th>
+        <th>CPF</th>
         <th>E-mail</th>
-        <th>Data de criação</th>
+        <th>Telefone</th>
+        <th>Data criação</th>
         <th>Ações</th>
       </tr>
       </thead>
@@ -16,8 +18,10 @@
       <tr v-for="avaliador in avaliadores" :key="avaliador.id">
         <td>{{ avaliador.id }}</td>
         <td>{{ avaliador.nome }}</td>
+        <td>{{ avaliador.cpf }}</td>
         <td>{{ avaliador.email }}</td>
-        <td>{{ avaliador.createdAt }}</td>
+        <td>{{ avaliador.telefone }}</td>
+        <td>{{ formatarData(avaliador.createdAt) }}</td>
         <td>
           <router-link class="btn btn-sm btn-warning" :to="`/avaliadores/editar/${avaliador.id}`">Editar</router-link>
           <button class="btn btn-sm btn-danger" @click="deletarAvaliador(avaliador.id)">Excluir</button>
@@ -48,6 +52,15 @@ export default {
       } catch (error) {
         console.error('Erro ao carregar avaliadores:', error);
       }
+    },
+    formatarData(isoDate) {
+      if (!isoDate) return '';
+      const data = new Date(isoDate);
+      return data.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
     },
     async deletarAvaliador(id) {
       if (confirm('Confirmar exclusão?')) {

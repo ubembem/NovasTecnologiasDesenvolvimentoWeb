@@ -1,86 +1,90 @@
-import { PrismaClient } from '@prisma/client';
-import { ProjetoDTO } from '../dto/ProjetoDTO.js';
-import { AutorDTO } from '../dto/AutorDTO.js';
-import { AvaliacaoDTO } from '../dto/AvaliacaoDTO.js';
-import { ProjetoVencedorDTO } from '../dto/ProjetoVencedorDTO.js';
-
-const prisma = new PrismaClient();
+// services/ConsultaService.js
+import prisma from '../lib/prismaClient.js';
 
 export class ConsultaService {
+
+    // Listar todos os projetos com seus autores
     static async listarProjetosComAutores() {
-        const projetos = await prisma.projeto.findMany({
-            include: { autor: true, premio: true },
-        });
-        return projetos.map((projeto) => new ProjetoDTO(projeto));
-    }
-
-    static async listarAutoresComProjetos() {
-        const autores = await prisma.autor.findMany({
-            include: { projetos: { include: { premio: true } } },
-        });
-        return autores.map((autor) => new AutorDTO(autor));
-    }
-
-    static async listarProjetosNaoAvaliados() {
-        const projetos = await prisma.projeto.findMany({
-            where: { avaliacoes: { none: {} } },
-            include: { autor: true, premio: true },
-        });
-        return projetos.map((projeto) => new ProjetoDTO(projeto));
-    }
-
-    static async listarProjetosAvaliados() {
-        const projetos = await prisma.projeto.findMany({
-            where: { avaliacoes: { some: {} } },
+        return prisma.projeto.findMany({
             include: {
-                autor: true,
+                autores: true,
                 premio: true,
-                avaliacoes: { include: { avaliador: true, projeto: true } },
+                avaliacoes: true
             },
+            orderBy: { id: 'asc' }
         });
-        return projetos.map((projeto) => ({
-            ...new ProjetoDTO(projeto),
-            avaliacoes: projeto.avaliacoes.map((avaliacao) => new AvaliacaoDTO(avaliacao)),
-        }));
     }
 
-    static async listarProjetosVencedores() {
-        const premios = await prisma.premio.findMany({
+    // Listar todos os autores com seus projetos
+    static async listarAutoresComProjetos() {
+        return prisma.autor.findMany({
             include: {
                 projetos: {
-                    where: { avaliacoes: { some: {} } },
-                    include: { autor: true, premio: true, avaliacoes: true },
-                },
+                    include: { premio: true } // inclui prêmio do projeto
+                }
+            },
+            orderBy: { id: 'asc' }
+        });
+    }
+
+    // Listar projetos que ainda não possuem avaliações
+    static async listarProjetosNaoAvaliados() {
+        return prisma.projeto.findMany({
+            where: {
+                avaliacoes: { none: {} } // projetos sem avaliações
+            },
+            include: {
+                autores: true,
+                premio: true,
+                avaliacoes: true
+            },
+            orderBy: { id: 'asc' }
+        });
+    }
+
+    // Listar projetos que possuem pelo menos uma avaliação
+    static async listarProjetosAvaliados() {
+        return prisma.projeto.findMany({
+            where: {
+                avaliacoes: { some: {} } // projetos com avaliações
+            },
+            include: {
+                autores: true,
+                premio: true,
+                avaliacoes: true
+            },
+            orderBy: { id: 'asc' }
+        });
+    }
+
+    // Lista projetos vencedores por premiação
+    static async listarProjetosVencedores() {
+        // Pega todos os projetos com autores, prêmio e avaliações
+        const projetos = await prisma.projeto.findMany({
+            where: { premioId: { not: null } }, // apenas projetos com prêmio
+            include: {
+                autores: true,
+                premio: true,
+                avaliacoes: true,
             },
         });
 
-        console.log('Prêmios encontrados:', premios); // Depuração
+        // Agrupa projetos por premioId
+        const premiosMap = {};
+        projetos.forEach(p => {
+            const notas = p.avaliacoes.map(a => a.nota);
+            const notaMedia = notas.length > 0 ? notas.reduce((a,b)=>a+b,0)/notas.length : 0;
+            if (!premiosMap[p.premioId]) {
+                premiosMap[p.premioId] = [];
+            }
+            premiosMap[p.premioId].push({ ...p, notaMedia });
+        });
 
-        const vencedores = [];
+        // Para cada premiação, seleciona apenas o projeto com maior nota média
+        const vencedores = Object.values(premiosMap).map(projs => {
+            return projs.reduce((prev, current) => (current.notaMedia > prev.notaMedia ? current : prev));
+        });
 
-        for (const premio of premios) {
-            const projetos = premio.projetos;
-            console.log(`Projetos para prêmio ${premio.nome}:`, projetos); // Depuração
-            if (projetos.length === 0) continue;
-
-            const projetosComNota = projetos.map((projeto) => {
-                const notaMedia = projeto.avaliacoes.reduce((sum, av) => sum + av.nota, 0) / projeto.avaliacoes.length;
-                return { projeto, notaMedia };
-            });
-
-            console.log(`Projetos com nota para prêmio ${premio.nome}:`, projetosComNota); // Depuração
-
-            // Encontrar o projeto com a maior nota média (primeiro em caso de empate)
-            const vencedor = projetosComNota.reduce((max, curr) =>
-                curr.notaMedia >= max.notaMedia ? curr : max
-            );
-
-            console.log(`Vencedor para prêmio ${premio.nome}:`, vencedor); // Depuração
-
-            vencedores.push(new ProjetoVencedorDTO(vencedor.projeto, vencedor.notaMedia));
-        }
-
-        console.log('Vencedores finais:', vencedores); // Depuração
         return vencedores;
     }
 }

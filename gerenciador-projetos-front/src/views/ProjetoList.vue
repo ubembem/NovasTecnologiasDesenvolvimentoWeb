@@ -1,15 +1,16 @@
 <template>
-  <div class="bg-primary mb-4">
+  <div class="table-responsive">
     <h2>Projetos</h2>
-    <router-link class="btn btn-secondary mb-3" to="/projetos/novo">Novo Projeto</router-link>
+    <router-link class="btn btn-primary mb-4" to="/projetos/novo">Novo Projeto</router-link>
     <table class="table table-striped">
-      <thead>
+      <thead class="table-dark">
       <tr>
         <th>ID</th>
         <th>Título</th>
         <th>Descrição</th>
         <th>Autor</th>
         <th>Prêmio</th>
+        <th>Data de criação</th>
         <th>Ações</th>
       </tr>
       </thead>
@@ -18,8 +19,9 @@
         <td>{{ projeto.id }}</td>
         <td>{{ projeto.titulo }}</td>
         <td>{{ projeto.descricao }}</td>
-        <td>{{ projeto.autorId }}</td>
+        <td>{{ projeto.autores }}</td>
         <td>{{ projeto.premioId }}</td>
+        <td>{{ formatarData(projeto.createdAt) }}</td>
         <td>
           <router-link class="btn btn-sm btn-warning" :to="`/projetos/editar/${projeto.id}`">Editar</router-link>
           <button class="btn btn-sm btn-danger" @click="deletarProjeto(projeto.id)">Excluir</button>
@@ -50,6 +52,15 @@ export default {
       } catch (error) {
         console.error('Erro ao carregar projetos:', error);
       }
+    },
+    formatarData(isoDate) {
+      if (!isoDate) return '';
+      const data = new Date(isoDate);
+      return data.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
     },
     async deletarProjeto(id) {
       if (confirm('Confirmar exclusão?')) {

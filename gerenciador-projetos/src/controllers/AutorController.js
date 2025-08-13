@@ -12,7 +12,9 @@ const autorSchema = z.object({
 const AutorController = {
     async getAllAutores(req, res) {
         try {
-            const autores = await prisma.autor.findMany();
+            const autores = await prisma.autor.findMany({
+                orderBy: { id: 'asc' }
+            });
             res.json(autores);
         } catch (err) {
             res.status(500).json({ erro: "Erro ao buscar autores" });
@@ -50,7 +52,11 @@ const AutorController = {
             const dados = autorSchema.parse(req.body);
             const atualizado = await prisma.autor.update({
                 where: { id: Number(id) },
-                data: dados
+                data: { nome: dados.nome,
+                    email: dados.email,
+                    cpf: dados.cpf,
+                    telefone: dados.telefone
+                }
             });
             res.json(atualizado);
         } catch (err) {

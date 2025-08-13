@@ -12,7 +12,9 @@ const avaliadorSchema = z.object({
 const AvaliadorController = {
     async getAllAvaliadores(req, res) {
         try {
-            const avaliadores = await prisma.avaliador.findMany();
+            const avaliadores = await prisma.avaliador.findMany({
+                orderBy: { id: 'asc' }
+            });
             res.json(avaliadores);
         } catch (err) {
             res.status(500).json({ erro: "Erro ao buscar avaliadores" });

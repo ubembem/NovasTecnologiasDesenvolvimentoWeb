@@ -46,6 +46,7 @@ model Projeto {
   descricao  String
   createdAt  DateTime    @default(now())
   premioId   Int?
+  autoresId  Int?
   premio     Premio?     @relation(fields: [premioId], references: [id])
   autores    Autor[]     @relation("AutoresProjeto")
   avaliacoes Avaliacao[]

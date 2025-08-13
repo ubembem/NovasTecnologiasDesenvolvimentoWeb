@@ -7,8 +7,16 @@
         <input v-model="avaliador.nome" class="form-control" required />
       </div>
       <div class="mb-3">
+        <label class="form-label">CPF</label>
+        <textarea v-model="avaliador.cpf" class="form-control" required></textarea>
+      </div>
+      <div class="mb-3">
         <label class="form-label">E-mail</label>
         <textarea v-model="avaliador.email" class="form-control" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Telefone</label>
+        <textarea v-model="avaliador.telefone" class="form-control" required></textarea>
       </div>
       <button type="submit" class="btn btn-primary">Salvar</button>
       <router-link class="btn btn-secondary" to="/avaliadores">Cancelar</router-link>

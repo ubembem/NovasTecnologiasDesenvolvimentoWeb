@@ -2,10 +2,9 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #242424;
+  background-color: #f9f9f9;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,28 +12,59 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Links */
 a {
   font-weight: 500;
   color: #646cff;
-  text-decoration: inherit;
+  text-decoration: none;
 }
 a:hover {
   color: #535bf2;
 }
 
+/* Body e containers */
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  padding: 0;
+  width: 100%;
   min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.container {
+  width: 95%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+#app {
+  width: 100%;
+  padding: 2rem;
+  text-align: left;
+}
+
+main {
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+/* Tipografia */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 3em;
 }
 
+p {
+  margin-bottom: 1rem;
+}
+
+/* Botões */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -43,26 +73,149 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
+  color: #fff;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, background-color 0.25s;
 }
 button:hover {
   border-color: #646cff;
+  background-color: #2a2a2a;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Cards */
 .card {
   padding: 2em;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Tabelas */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto; /* scroll horizontal só se necessário */
+}
+
+.table-responsive table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto; /* distribui largura conforme conteúdo */
+  white-space: nowrap; /* impede quebra de linha desnecessária */
+}
+
+.table-responsive th,
+.table-responsive td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  overflow: hidden;
+  text-overflow: ellipsis; /* mostra "..." se o conteúdo for muito grande */
+}
+
+.table-responsive th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.table-responsive tr:hover {
+  background-color: #f1f1f1;
+}
+
+
+/*!* Ajuste de colunas específicas (opcional) *!*/
+/*.table-responsive th:nth-child(1) { width: 3%; }   !* ID *!*/
+/*.table-responsive th:nth-child(2) { width: 15%; }  !* Nome *!*/
+/*.table-responsive th:nth-child(3) { width: 30%; }  !* Email *!*/
+/*.table-responsive th:nth-child(4) { width: 5%; }  !* CPF *!*/
+/*.table-responsive th:nth-child(5) { width: 11%; }  !* Telefone *!*/
+/*.table-responsive th:nth-child(6) { width: 9%; }  !* Ações *!*/
+/*.table-responsive th:nth-child(7) { width: 9%; }  !* Ações *!*/
+/*.table-responsive th:nth-child(8) { width: 11%; }  !* Ações *!*/
+
+/* Navbar e links */
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #e9ecef;
+  margin-bottom: 1rem;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-right: 2rem;
+}
+
+.navbar-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: #646cff;
+}
+
+/* Dropdown Consultas */
+.nav-item.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  min-width: 200px;
+  padding: 0.5rem 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 1rem;
+  color: #333;
+  text-decoration: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+  color: #646cff;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .navbar-nav {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .table-responsive table {
+    font-size: 0.9rem;
+  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -75,5 +228,10 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+    color: #000;
+  }
+  .card {
+    background-color: #f9f9f9;
   }
 }
+

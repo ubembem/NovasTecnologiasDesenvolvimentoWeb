@@ -1,9 +1,9 @@
 <template>
-  <div class="bg-primary mb-4">
+  <div class="table-responsive">
     <h2>Avaliações</h2>
-    <router-link class="btn btn-secondary mb-3" to="/avaliacoes/novo">Novo Avaliação</router-link>
+    <router-link class="btn btn-primary mb-4" to="/avaliacoes/novo">Novo Avaliação</router-link>
     <table class="table table-striped">
-      <thead>
+      <thead class="table-dark">
       <tr>
         <th>ID</th>
         <th>ID do projeto</th>
@@ -23,7 +23,7 @@
         <td>{{ avaliacao.avaliadorId }}</td>
         <td>{{ avaliacao.nota }}</td>
         <td>{{ avaliacao.comentario }}</td>
-        <td>{{ avaliacao.createdAt }}</td>
+        <td>{{ formatarData(avaliacao.createdAt) }}</td>
         <td>
           <router-link class="btn btn-sm btn-warning" :to="`/avaliacoes/editar/${avaliacao.id}`">Editar</router-link>
           <button class="btn btn-sm btn-danger" @click="deletarAvaliacao(avaliacao.id)">Excluir</button>
@@ -54,6 +54,15 @@ export default {
       } catch (error) {
         console.error('Erro ao carregar avaliacoes:', error);
       }
+    },
+    formatarData(isoDate) {
+      if (!isoDate) return '';
+      const data = new Date(isoDate);
+      return data.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
     },
     async deletarAvaliacao(id) {
       if (confirm('Confirmar exclusão?')) {
